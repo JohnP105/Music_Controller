@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {
   Button,
   Grid,
@@ -11,14 +11,12 @@ import {
   RadioGroup,
   FormControlLabel,
 } from "@mui/material";
-import { Link } from "react-router-dom";
 
 const CreateRoomPage = () => {
 
   const navigate = useNavigate();
   const defaultVotes = 2;
-
-
+  
   const [roomState, setRoomState] = useState({
     guestCanPause: true,
     votesToSkip: defaultVotes,
@@ -54,11 +52,11 @@ const CreateRoomPage = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        navigate(`/room/${data.code}`); // Redirect to the created room
+        navigate('/room/${data.code}'); // Redirect to the created room
       });
   };
 
-  
+
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">

@@ -8,6 +8,7 @@ const Room = ({ roomCode }) => {
     guestCanPause: false,
     isHost: false,
   });
+
   useEffect(() => {
     const getRoomDetails = async () => {
       try {
@@ -22,7 +23,6 @@ const Room = ({ roomCode }) => {
         console.error("Error fetching room details:", error);
       }
     };
-
     getRoomDetails();
   }, [roomCode]);
 
