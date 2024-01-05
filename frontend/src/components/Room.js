@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-const Room = (props) => {
+const Room = ({ roomCode }) => {
+
   const [roomDetails, setRoomDetails] = useState({
     votesToSkip: 2,
     guestCanPause: false,
     isHost: false,
   });
-
-  const { roomCode } = props;
-
   useEffect(() => {
     const getRoomDetails = async () => {
       try {
@@ -28,6 +26,7 @@ const Room = (props) => {
     getRoomDetails();
   }, [roomCode]);
 
+
   return (
     <div>
       <h3>{roomCode}</h3>
@@ -37,6 +36,7 @@ const Room = (props) => {
     </div>
   );
 };
+
 
 const RoomWrapper = () => {
   const { roomCode } = useParams();

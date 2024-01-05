@@ -1,24 +1,29 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import FormHelperText from "@mui/material/FormHelperText";
-import FormControl from "@mui/material/FormControl";
+import {
+  Button,
+  Grid,
+  Typography,
+  TextField,
+  FormHelperText,
+  FormControl,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+} from "@mui/material";
 import { Link } from "react-router-dom";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 
 const CreateRoomPage = () => {
+
   const navigate = useNavigate();
   const defaultVotes = 2;
+
 
   const [roomState, setRoomState] = useState({
     guestCanPause: true,
     votesToSkip: defaultVotes,
   });
+
 
   const handleVotesChange = (e) => {
     setRoomState({
@@ -27,12 +32,14 @@ const CreateRoomPage = () => {
     });
   };
 
+
   const handleGuestCanPauseChange = (e) => {
     setRoomState({
       ...roomState,
       guestCanPause: e.target.value === "true",
     });
   };
+
 
   const handleRoomButtonPressed = () => {
     const requestOptions = {
@@ -51,6 +58,7 @@ const CreateRoomPage = () => {
       });
   };
 
+  
   return (
     <Grid container spacing={1}>
       <Grid item xs={12} align="center">
