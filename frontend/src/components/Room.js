@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate} from "react-router-dom";
+import { Grid, Button, Typography } from "@mui/material";
 
 const Room = ({ roomCode }) => {
-
+  const navigate = useNavigate();
   const [roomDetails, setRoomDetails] = useState({
     votesToSkip: 2,
     guestCanPause: false,
@@ -13,6 +14,12 @@ const Room = ({ roomCode }) => {
     const getRoomDetails = async () => {
       try {
         const response = await fetch(`/api/get-room?code=${roomCode}`);
+        
+        if (!response.ok) {
+          navigate("/");
+          return;
+        }
+    
         const data = await response.json();
         setRoomDetails({
           votesToSkip: data.votes_to_skip,
@@ -27,13 +34,55 @@ const Room = ({ roomCode }) => {
   }, [roomCode]);
 
 
+  const leaveButtonPressed = () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+    fetch("/api/leave-room", requestOptions)
+      .then((_response) => {
+        navigate('/'); // Redirect to the home page
+      }) 
+  };
+
+  
+
+
   return (
-    <div>
-      <h3>{roomCode}</h3>
-      <p>Votes: {roomDetails.votesToSkip}</p>
-      <p>Guest Can Pause: {roomDetails.guestCanPause.toString()}</p>
-      <p>Host: {roomDetails.isHost.toString()}</p>
-    </div>
+    <Grid container spacing={1}>
+
+      <Grid item xs={12} align="center">
+        <Typography variant="h4" component="h4">
+          Code: {roomCode}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} align="center">
+        <Typography variant="h6" component="h6">
+            Votes: {roomDetails.votesToSkip}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} align="center">
+        <Typography variant="h6" component="h6">
+          Guest Can Pause: {roomDetails.guestCanPause.toString()}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} align="center">
+        <Typography variant="h6" component="h6">
+          Host: {roomDetails.isHost.toString()}
+        </Typography>
+      </Grid>
+
+      <Grid item xs={12} align="center">
+        <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>
+          Leave Room
+        </Button>
+      </Grid>
+
+    </Grid>
+
   );
 };
 
@@ -41,7 +90,7 @@ const Room = ({ roomCode }) => {
 const RoomWrapper = () => {
   const { roomCode } = useParams();
 
-  return <Room roomCode={roomCode} />;
+  return <Room roomCode={roomCode}/>;
 };
 
 export default RoomWrapper;

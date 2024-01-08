@@ -12,6 +12,7 @@ import {
   FormControlLabel,
 } from "@mui/material";
 
+
 const CreateRoomPage = () => {
 
   const navigate = useNavigate();
@@ -52,7 +53,7 @@ const CreateRoomPage = () => {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        navigate('/room/${data.code}'); // Redirect to the created room
+        navigate(`/room/${data.code}`); // Redirect to the created room
       });
   };
 

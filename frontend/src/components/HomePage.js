@@ -22,13 +22,30 @@ const HomePage = () => {
   }, []);
 
 
+  const checkRoomExists = (e) => {
+    if (!roomCode) {return;}
+    
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        code: roomCode
+      }),
+    };
+    fetch("/api/join-room", requestOptions)
+      .then((response) => {
+        if (response.ok) {
+          return <Navigate to={`/room/${roomCode}`} replace={true} />; //Redirect to joined-room
+        }
+        setRoomCode(null);
+        return;
+      })
+  }
+
+
   const renderHomePage = () => {
-    if (roomCode) {
-      return (
-        <Navigate to={`/room/${roomCode}`} replace={true} />
-      );
-    } else {
-      return (
+    checkRoomExists();
+    return (
         <Grid container spacing={3}>
           <Grid item xs={12} align="center">
             <Typography variant="h3" compact="h3">
@@ -47,7 +64,6 @@ const HomePage = () => {
           </Grid>
         </Grid>
       );
-    }
   };
 
   return (
@@ -56,7 +72,9 @@ const HomePage = () => {
         <Route path="/" element={renderHomePage()}/>
         <Route path="/join" element={<RoomJoinPage />} />
         <Route path="/create" element={<CreateRoomPage />} />
-        <Route path="/room/:roomCode" element={<Room />} />
+        <Route
+          path="/room/:roomCode" element={<Room />}
+        />      
       </Routes>
     </Router>
   );
