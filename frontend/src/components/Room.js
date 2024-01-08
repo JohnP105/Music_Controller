@@ -8,6 +8,7 @@ const Room = ({ roomCode }) => {
     votesToSkip: 2,
     guestCanPause: false,
     isHost: false,
+    showSettings: false,
   });
 
   useEffect(() => {
@@ -46,7 +47,27 @@ const Room = ({ roomCode }) => {
   };
 
   
+  const updateShowSettings = (value) => {
+    setRoomDetails( {
+      showSettings: value,
+    });
+  };
 
+
+  const renderSettingsButton = () => {
+    return (
+      <Grid item xs={12} align="center">
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => updateShowSettings(true)}
+        >
+          Settings
+        </Button>
+      </Grid>
+    );
+  };
+  
 
   return (
     <Grid container spacing={1}>
@@ -74,6 +95,7 @@ const Room = ({ roomCode }) => {
           Host: {roomDetails.isHost.toString()}
         </Typography>
       </Grid>
+      {roomDetails.isHost ? renderSettingsButton() : null}
 
       <Grid item xs={12} align="center">
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>
