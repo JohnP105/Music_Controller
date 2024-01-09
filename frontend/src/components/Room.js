@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate} from "react-router-dom";
 import { Grid, Button, Typography } from "@mui/material";
+import CreateRoomPage from "./CreateRoomPage";
+
 
 const Room = ({ roomCode }) => {
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const Room = ({ roomCode }) => {
   
   const updateShowSettings = (value) => {
     setRoomDetails( {
+      ...roomDetails,
       showSettings: value,
     });
   };
@@ -67,9 +70,36 @@ const Room = ({ roomCode }) => {
       </Grid>
     );
   };
-  
 
+  const renderSettings = () => {
+    return (
+      <Grid container spacing={1}>
+        <Grid item xs={12} align="center">
+          <CreateRoomPage
+            update={true}
+            votesToSkip={roomDetails.votesToSkip}
+            guestCanPause={roomDetails.guestCanPause}
+            roomCode={roomCode}
+            updateCallback={ () => {}}
+          />
+        </Grid>
+        <Grid item xs={12} align="center">
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => updateShowSettings(false)}
+          >
+            Close
+          </Button>
+        </Grid>
+      </Grid>
+    );
+  };
+
+
+  if (roomDetails.showSettings) { return renderSettings();}
   return (
+  
     <Grid container spacing={1}>
 
       <Grid item xs={12} align="center">
