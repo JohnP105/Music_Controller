@@ -13,26 +13,29 @@ const Room = ({ roomCode }) => {
     showSettings: false,
   });
 
-  useEffect(() => {
-    const getRoomDetails = async () => {
-      try {
-        const response = await fetch(`/api/get-room?code=${roomCode}`);
-        
-        if (!response.ok) {
-          navigate("/");
-          return;
-        }
-    
-        const data = await response.json();
-        setRoomDetails({
-          votesToSkip: data.votes_to_skip,
-          guestCanPause: data.guest_can_pause,
-          isHost: data.is_host,
-        });
-      } catch (error) {
-        console.error("Error fetching room details:", error);
+
+  const getRoomDetails = async () => {
+    try {
+      const response = await fetch(`/api/get-room?code=${roomCode}`);
+
+      if (!response.ok) {
+        navigate("/");
+        return;
       }
-    };
+
+      const data = await response.json();
+      setRoomDetails({
+        votesToSkip: data.votes_to_skip,
+        guestCanPause: data.guest_can_pause,
+        isHost: data.is_host,
+      });
+    } catch (error) {
+      console.error("Error fetching room details:", error);
+    }
+  };
+
+
+  useEffect(() => {
     getRoomDetails();
   }, [roomCode]);
 
@@ -80,15 +83,17 @@ const Room = ({ roomCode }) => {
             votesToSkip={roomDetails.votesToSkip}
             guestCanPause={roomDetails.guestCanPause}
             roomCode={roomCode}
-            updateCallback={ () => {}}
+            updateCallback={getRoomDetails}
           />
         </Grid>
         <Grid item xs={12} align="center">
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => updateShowSettings(false)}
-          >
+            onClick={() => {
+              updateShowSettings(false);
+            }}
+          >          
             Close
           </Button>
         </Grid>
