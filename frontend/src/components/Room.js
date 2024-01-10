@@ -11,13 +11,13 @@ const Room = ({ roomCode }) => {
     guestCanPause: false,
     isHost: false,
     showSettings: false,
+    spotifyAuthenticated: false,
   });
 
 
   const getRoomDetails = async () => {
     try {
       const response = await fetch(`/api/get-room?code=${roomCode}`);
-
       if (!response.ok) {
         navigate("/");
         return;
@@ -29,10 +29,31 @@ const Room = ({ roomCode }) => {
         guestCanPause: data.guest_can_pause,
         isHost: data.is_host,
       });
+      if (roomDetails.isHost) {
+        authenticateSpotify();
+      }
+
     } catch (error) {
       console.error("Error fetching room details:", error);
     }
   };
+
+
+  const authenticateSpotify = () => {
+    fetch("/spotify/is-authenticated")
+      .then((response) => response.json())
+      .then((data) => {
+        setRoomDetails({ spotifyAuthenticated: data.status });
+        console.log(data.status);
+        if (!data.status) {
+          fetch("/spotify/get-auth-url")
+            .then((response) => response.json())
+            .then((data) => {
+              window.location.replace(data.url);
+            });
+        }
+      });
+  }
 
 
   useEffect(() => {
