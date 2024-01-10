@@ -76,7 +76,7 @@ const CreateRoomPage = ({
         setErrorMsg("Error updating room...");
       }
       defaultUpdateCallback();
-    });
+  });
   }
   
 
@@ -127,7 +127,7 @@ const CreateRoomPage = ({
   return (
     <Grid container spacing={1}>
 
-      <Grid item xs={12} align="center">
+      {/* <Grid item xs={12} align="center">
         <Collapse in={errorMsg !== "" || successMsg !== ""}>
           {successMsg !== "" ? (
             <Alert
@@ -149,7 +149,7 @@ const CreateRoomPage = ({
             </Alert>
           )}
         </Collapse>
-      </Grid>
+      </Grid> */}
 
       <Grid item xs={12} align="center">
         <Typography component="h4" variant="h4">
