@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate} from "react-router-dom";
 import { Grid, Button, Typography } from "@mui/material";
 import CreateRoomPage from "./CreateRoomPage";
+import MusicPlayer from "./MusicPlayer";
 
 
 const Room = ({ roomCode }) => {
@@ -12,39 +13,46 @@ const Room = ({ roomCode }) => {
     isHost: false,
     showSettings: false,
     spotifyAuthenticated: false,
+    song: {}
   });
 
+  useEffect(() => {
+    getRoomDetails();
+    const interval = setInterval(getCurrentSong, 1000); 
+    return () => clearInterval(interval);
+  }, [roomCode]);
 
-  const getRoomDetails = async () => {
-    try {
-      const response = await fetch(`/api/get-room?code=${roomCode}`);
-      if (!response.ok) {
-        navigate("/");
-        return;
-      }
-
-      const data = await response.json();
-      setRoomDetails({
-        votesToSkip: data.votes_to_skip,
-        guestCanPause: data.guest_can_pause,
-        isHost: data.is_host,
+  const getRoomDetails = () => {
+    fetch("/api/get-room" + "?code=" + roomCode)
+      .then((response) => {
+        if (!response.ok) {
+          navigate("/");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        setRoomDetails((prevState) => ({
+          ...prevState,
+          votesToSkip: data.votes_to_skip,
+          guestCanPause: data.guest_can_pause,
+          isHost: data.is_host,
+        }));
+        if (roomDetails.isHost) {
+          authenticateSpotify();
+        }
+        else { console.log("Authenticated: false"); }
       });
-      if (roomDetails.isHost) {
-        authenticateSpotify();
-      }
-
-    } catch (error) {
-      console.error("Error fetching room details:", error);
-    }
   };
-
 
   const authenticateSpotify = () => {
     fetch("/spotify/is-authenticated")
       .then((response) => response.json())
       .then((data) => {
-        setRoomDetails({ spotifyAuthenticated: data.status });
-        console.log(data.status);
+        setRoomDetails((prevState) => ({
+          ...prevState,
+          spotifyAuthenticated: data.status,
+        }));
+        console.log("Authenticated" + data.status);
         if (!data.status) {
           fetch("/spotify/get-auth-url")
             .then((response) => response.json())
@@ -53,12 +61,25 @@ const Room = ({ roomCode }) => {
             });
         }
       });
-  }
+  };
 
-
-  useEffect(() => {
-    getRoomDetails();
-  }, [roomCode]);
+  const getCurrentSong = () => {
+    fetch("/spotify/current-song")
+      .then((response) => {
+        if (!response.ok) {
+          return {};
+        } else {
+          return response.json();
+        }
+      })
+      .then((data) => {
+        setRoomDetails((prevState) => ({
+          ...prevState,
+          song: data,
+        }));
+        console.log(data);
+      });
+  };
 
 
   const leaveButtonPressed = () => {
@@ -72,27 +93,11 @@ const Room = ({ roomCode }) => {
       }) 
   };
 
-  
   const updateShowSettings = (value) => {
-    setRoomDetails( {
-      ...roomDetails,
+    setRoomDetails((prevState) => ({
+      ...prevState,
       showSettings: value,
-    });
-  };
-
-
-  const renderSettingsButton = () => {
-    return (
-      <Grid item xs={12} align="center">
-        <Button 
-          variant="contained" 
-          color="primary" 
-          onClick={() => updateShowSettings(true)}
-        >
-          Settings
-        </Button>
-      </Grid>
-    );
+    }));
   };
 
   const renderSettings = () => {
@@ -122,10 +127,23 @@ const Room = ({ roomCode }) => {
     );
   };
 
+  const renderSettingsButton = () => {
+    return (
+      <Grid item xs={12} align="center">
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={() => updateShowSettings(true)}
+        >
+          Settings
+        </Button>
+      </Grid>
+    );
+  };
+
 
   if (roomDetails.showSettings) { return renderSettings();}
   return (
-  
     <Grid container spacing={1}>
 
       <Grid item xs={12} align="center">
@@ -134,25 +152,8 @@ const Room = ({ roomCode }) => {
         </Typography>
       </Grid>
 
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-            Votes: {roomDetails.votesToSkip}
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Guest Can Pause: {roomDetails.guestCanPause.toString()}
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12} align="center">
-        <Typography variant="h6" component="h6">
-          Host: {roomDetails.isHost.toString()}
-        </Typography>
-      </Grid>
+      <MusicPlayer {...roomDetails.song} />
       {roomDetails.isHost ? renderSettingsButton() : null}
-
       <Grid item xs={12} align="center">
         <Button variant="contained" color="secondary" onClick={leaveButtonPressed}>
           Leave Room
